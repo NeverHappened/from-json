@@ -12,7 +12,7 @@ export function Property(config: PropertyConfig = {}): Function  {
     const serverPropertyKey = key || propertyKey;
     const modifiedProperties: Properties = target.properties || [];
 
-    const propertyClass = Reflect.getMetadata('design:type', target, serverPropertyKey);
+    const propertyClass = Reflect.getMetadata('design:type', target, propertyKey);
     const isArray = propertyClass === Array;
     const isGeneric = generic || false;
     const constructr = autodiscovered ? propertyClass : customClass;
@@ -22,7 +22,7 @@ export function Property(config: PropertyConfig = {}): Function  {
   };
 }
 
-export function typeInfo(base: TypeBase, children = null) {
+export function typeInfo(base: TypeBase, children: TypeChildren = null): TypeInfo {
   return { base, children };
 }
 

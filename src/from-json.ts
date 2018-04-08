@@ -1,11 +1,12 @@
 
-import { InnerPropertyConfig, Properties, TypeBase, TypeInfo, typeInfo as ty } from './public-api';
+import { InnerPropertyConfig, Properties, TypeBase, TypeInfo, typeInfo as ty, TypeChildren } from './public-api';
 
 export namespace FromJson {
 
   export function fromJson<T>(type: TypeInfo, rawData: any): T {
-    const result = new type.base();
-    const properties: Properties = type.base.prototype['properties'];
+    const { base, children } = type;
+    const result = new base();
+    const properties: Properties = base.prototype['properties'];
 
     Object.keys(rawData).forEach((serverPropertyKey) => {
       const property: InnerPropertyConfig = properties[serverPropertyKey];
@@ -13,7 +14,7 @@ export namespace FromJson {
         throw new Error(`[FromJson]: Unknown property passed: ${serverPropertyKey}`);
       }
 
-      const config = combineConfig(property, serverPropertyKey, type, rawData);
+      const config = combineConfig(property, serverPropertyKey, children, rawData);
       result[property.propertyKey] = convertProperty(config);
     });
 
@@ -23,17 +24,16 @@ export namespace FromJson {
   function combineConfig(
     property: InnerPropertyConfig,
     serverPropertyKey: string,
-    type: TypeInfo,
+    children: TypeChildren,
     rawData: any,
   ): UpdateInfo {
     let { propertyKey, isGeneric, isArray, constructr } = property;
 
     if (isGeneric) {
-      constructr = type.children[propertyKey].base;
-
-      if (!constructr) {
+      if (!children[propertyKey]) {
         throw new Error(`[FromJson] You cannot use generic properties without specifing their concrete type. Error on ${propertyKey} property`);
       }
+      constructr = children[propertyKey].base;
     }
 
     const rawValue: any = rawData[serverPropertyKey];

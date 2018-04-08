@@ -9,6 +9,10 @@ class SimpleClass {
   public convertableProperty: string;
 
   public notConvertableProperty: number = 3;
+
+  public test(): number {
+    return 2;
+  }
 }
 
 describe('Basics', () => {
@@ -23,6 +27,12 @@ describe('Basics', () => {
     const raw = { convertableProperty: 'Test' };
     const converted = fromJson<SimpleClass>(typeInfo(SimpleClass), raw);
     expect(converted.convertableProperty).to.equal('Test');
+  });
+
+  it ('should have methods of the class', () => {
+    const raw = { convertableProperty: 'Test' };
+    const converted = fromJson<SimpleClass>(typeInfo(SimpleClass), raw);
+    expect(converted.test()).to.equal(2);
   });
 
   it('should throw an exception when there are non-existent properties', () => {

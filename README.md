@@ -6,7 +6,7 @@ Before usage you must import 'reflect-metadata' package into your project
 ```
 import 'reflect-metadata';
 ```
-
+Also you need to set ```"emitDecoratorMetadata": true``` in your tsconfig.json to autodiscover feature to work
 
 
 # Development
