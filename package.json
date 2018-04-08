@@ -1,0 +1,16 @@
+{
+  "name": "from-json",
+  "version": "0.0.1",
+  "description": "Easily convert from json object to classes with decorators",
+  "scripts": {
+    "compile": "tsc"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Dmitry Kolupaev <dmitry.klpv@gmail.com>",
+  "license": "MIT",
+  "private": null,
+  "devDependencies": {
+    "typescript": "^2.8.1"
+  }
+}
