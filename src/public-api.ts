@@ -6,7 +6,7 @@ export function fromJson<T>(type: TypeInfo, rawData: any): T {
 }
 
 export function Property(config: PropertyConfig = {}): Function  {
-  const { key, customClass, generic } = config;
+  const { key, customClass, generic, autodiscovered } = config;
 
   return function(target: any, propertyKey: string) {
     const serverPropertyKey = key || propertyKey;
@@ -15,8 +15,9 @@ export function Property(config: PropertyConfig = {}): Function  {
     const propertyClass = Reflect.getMetadata('design:type', target, serverPropertyKey);
     const isArray = propertyClass === Array;
     const isGeneric = generic || false;
+    const constructr = autodiscovered ? propertyClass : customClass;
 
-    modifiedProperties[serverPropertyKey] = { propertyKey, customClass, isArray, isGeneric };
+    modifiedProperties[serverPropertyKey] = { propertyKey, constructr, isArray, isGeneric };
     target.properties = modifiedProperties;
   };
 }
@@ -26,9 +27,17 @@ export function typeInfo(base: TypeBase, children = null) {
 }
 
 export interface PropertyConfig {
+  // If present, used as an incoming key. Else the property name will be used
   key?: string;
+
+  // If present, we'll use this class to initialize property
   customClass?: TypeBase;
+
+  // If true, we'll use the TypeInfo that's passed in fromJson to determine the property class
   generic?: boolean;
+  
+  // If true, property class will be deduced from the property field
+  autodiscovered?: boolean;
 }
 
 export interface Properties {
@@ -52,5 +61,5 @@ export interface InnerPropertyConfig {
   propertyKey: string;
   isGeneric: boolean;
   isArray: boolean;
-  customClass?: TypeBase;
+  constructr?: TypeBase;
 }

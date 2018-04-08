@@ -26,37 +26,37 @@ export namespace FromJson {
     type: TypeInfo,
     rawData: any,
   ): UpdateInfo {
-    let { propertyKey, isGeneric, isArray, customClass } = property;
+    let { propertyKey, isGeneric, isArray, constructr } = property;
 
     if (isGeneric) {
-      customClass = type.children[propertyKey].base;
+      constructr = type.children[propertyKey].base;
 
-      if (!customClass) {
+      if (!constructr) {
         throw new Error(`[FromJson] You cannot use generic properties without specifing their concrete type. Error on ${propertyKey} property`);
       }
     }
 
     const rawValue: any = rawData[serverPropertyKey];
-    const needRecursiveConversion: boolean = isArray && (!!customClass);
+    const needRecursiveConversion: boolean = isArray && (!!constructr);
 
     return {
       rawValue,
       needRecursiveConversion,
-      customClass,
+      constructr,
     };
   }
 
   function convertProperty<T>(update: UpdateInfo): any {
-    const { needRecursiveConversion, rawValue, customClass } = update;
+    const { needRecursiveConversion, rawValue, constructr } = update;
 
-    if (needRecursiveConversion) { return rawValue.map((element) => fromJson(ty(customClass), element)); }
-    else if (customClass) { return fromJson(ty(customClass), rawValue); }
+    if (needRecursiveConversion) { return rawValue.map((element) => fromJson(ty(constructr), element)); }
+    else if (constructr) { return fromJson(ty(constructr), rawValue); }
     else { return rawValue; }
   }
 
   interface UpdateInfo {
     rawValue: any;
     needRecursiveConversion: boolean;
-    customClass: TypeBase;
+    constructr: TypeBase;
   }
 }
