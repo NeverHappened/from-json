@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import 'mocha';
+import 'reflect-metadata';
 import { Property, fromJson, typeInfo } from '../public-api';
 
 class SimpleClass {

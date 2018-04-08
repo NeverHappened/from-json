@@ -5,48 +5,52 @@ export function fromJson<T>(type: TypeInfo, rawData: any): T {
   return FromJson.fromJson(type, rawData);
 }
 
-/**
- *   target: property to modify
- *   propertyKey: server property to convert from
- *   customClass: property when nested class exists
-*/
-export function Property<T>(config: PropertyConfig<T> = {}): Function  {
-  const { key, customClass, arrayType, generic } = config;
+export function Property(config: PropertyConfig = {}): Function  {
+  const { key, customClass, generic } = config;
 
   return function(target: any, propertyKey: string) {
     const serverPropertyKey = key || propertyKey;
+    const modifiedProperties: Properties = target.properties || [];
 
-    const result: { [name: string]: InnerPropertyConfig<T> } = target.properties || [];
-    const constructr = customClass ? Reflect.getMetadata('design:type', target, serverPropertyKey) : null;
-    result[serverPropertyKey] = { propertyKey, customClass, constructr, arrayType, generic };
-    target['properties'] = result;
+    const propertyClass = Reflect.getMetadata('design:type', target, serverPropertyKey);
+    const isArray = propertyClass === Array;
+    const isGeneric = generic || false;
+
+    modifiedProperties[serverPropertyKey] = { propertyKey, customClass, isArray, isGeneric };
+    target.properties = modifiedProperties;
   };
 }
 
-export interface PropertyConfig<T> {
-  key?: string;
-  customClass?: boolean;
-  generic?: boolean;
-  arrayType?: { new(): T };
+export function typeInfo(base: TypeBase, children = null) {
+  return { base, children };
 }
 
-export interface InnerPropertyConfig<T> {
-  propertyKey?: string;
-  customClass?: boolean;
+export interface PropertyConfig {
+  key?: string;
+  customClass?: TypeBase;
   generic?: boolean;
-  arrayType?: { new(): T };
-  constructr?: { new(): T };
+}
+
+export interface Properties {
+  [name: string]: InnerPropertyConfig;
+}
+
+export interface TypeInfo {
+  base: TypeBase;
+  children?: TypeChildren;
 }
 
 export interface TypeBase {
   new();
 }
 
-export interface TypeInfo {
-  base: TypeBase;
-  children?: { [property: string]: TypeInfo };
+export interface TypeChildren {
+  [property: string]: TypeInfo;
 }
 
-export function typeInfo(base: TypeBase, children = null) {
-  return { base, children };
+export interface InnerPropertyConfig {
+  propertyKey: string;
+  isGeneric: boolean;
+  isArray: boolean;
+  customClass?: TypeBase;
 }
