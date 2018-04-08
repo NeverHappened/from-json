@@ -1,39 +1,48 @@
 
-import { TypeInfo, InnerPropertyConfig } from './public-api';
+import { InnerPropertyConfig, TypeInfo, TypeBase, typeInfo as ty } from './public-api';
 
 export namespace FromJson {
 
-  export function fromJson<T>(type: TypeInfo, raw: any): T {
-    const obj = new type.base();
+  export function fromJson<T>(type: TypeInfo, rawData: any): T {
+    const result = new type.base();
     // NOTE: Map server names to `T` object names
     const properties: { [name: string]: InnerPropertyConfig<T> } = type.base.prototype['properties'];
 
-    Object.keys(raw).forEach((serverPropertyName) => {
-      const property: InnerPropertyConfig<T> = properties[serverPropertyName];
-      const innerValue: any = raw[serverPropertyName];
-      let objectPropertyValue;
-
-      if (!property) {
-        throw new Error(`[FromJson]: Unknown property passed: ${serverPropertyName}`);
-      }
-
-      const propertyConstructor = type.children ? type.children[property.propertyKey].base : null;
-
-      if (property.generic) {
-        property.arrayType = propertyConstructor;
-      }
-
-      if (property.arrayType) {
-        objectPropertyValue = innerValue.map((element) => this.convertFromJson(property.arrayType, element));
-      } else if (property.nestedClass) {
-        objectPropertyValue = this.convertFromJson(property.constructr, innerValue);
-      } else {
-        objectPropertyValue = innerValue;
-      }
-
-      obj[property.propertyKey] = objectPropertyValue;
+    Object.keys(rawData).forEach((serverPropertyKey) => {
+      const property: InnerPropertyConfig<T> = properties[serverPropertyKey];
+      convertProperty(result, property, serverPropertyKey, type, rawData);
     });
 
-    return obj;
+    return result;
+  }
+
+  function convertProperty<T>(
+    result: TypeBase,
+    property: InnerPropertyConfig<T> | null,
+    serverPropertyKey: string,
+    type: TypeInfo,
+    rawData: any,
+  ) {
+    if (!property) {
+      throw new Error(`[FromJson]: Unknown property passed: ${serverPropertyKey}`);
+    }
+
+    if (property.generic) {
+      const propertyConstructor = type.children ? type.children[property.propertyKey].base : null;
+      property.arrayType = propertyConstructor;
+    }
+
+    const rawValue: any = rawData[serverPropertyKey];
+
+    let objectPropertyValue;
+    if (property.arrayType) {
+      objectPropertyValue = rawValue.map((element) => fromJson(ty(property.arrayType), element));
+    } else if (property.customClass) {
+      objectPropertyValue = fromJson(ty(property.constructr), rawValue);
+    } else {
+      objectPropertyValue = rawValue;
+    }
+
+    result[property.propertyKey] = objectPropertyValue;
   }
 }

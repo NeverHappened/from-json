@@ -1,43 +1,38 @@
 /// <reference types="reflect-metadata" />
-
 import { FromJson } from './from-json';
 
-export function fromJson<T>(type: TypeInfo, raw: any): T {
-  return FromJson.fromJson(type, raw);
+export function fromJson<T>(type: TypeInfo, rawData: any): T {
+  return FromJson.fromJson(type, rawData);
 }
 
 /**
  *   target: property to modify
  *   propertyKey: server property to convert from
- *   nestedClass: property when nested class exists
+ *   customClass: property when nested class exists
 */
 export function Property<T>(config: PropertyConfig<T> = {}): Function  {
-  let { serverPropertyKey } = config;
-  const { nestedClass, arrayType, generic } = config;
+  const { key, customClass, arrayType, generic } = config;
 
   return function(target: any, propertyKey: string) {
-    if (!serverPropertyKey) {
-      serverPropertyKey = propertyKey;
-    }
+    const serverPropertyKey = key || propertyKey;
 
     const result: { [name: string]: InnerPropertyConfig<T> } = target.properties || [];
-    const constructr = (nestedClass || arrayType) ? Reflect.getMetadata('design:type', target, serverPropertyKey) : null;
-    result[serverPropertyKey] = { nestedClass, propertyKey, constructr, arrayType, generic };
+    const constructr = customClass ? Reflect.getMetadata('design:type', target, serverPropertyKey) : null;
+    result[serverPropertyKey] = { propertyKey, customClass, constructr, arrayType, generic };
     target['properties'] = result;
   };
 }
 
 export interface PropertyConfig<T> {
-  serverPropertyKey?: string;
-  nestedClass?: boolean;
+  key?: string;
+  customClass?: boolean;
   generic?: boolean;
   arrayType?: { new(): T };
-  constructr?: { new(): T };
 }
 
 export interface InnerPropertyConfig<T> {
   propertyKey?: string;
-  nestedClass?: boolean;
+  customClass?: boolean;
   generic?: boolean;
   arrayType?: { new(): T };
   constructr?: { new(): T };
@@ -52,6 +47,6 @@ export interface TypeInfo {
   children?: { [property: string]: TypeInfo };
 }
 
-export function typeInfo(base, children = null) {
+export function typeInfo(base: TypeBase, children = null) {
   return { base, children };
 }

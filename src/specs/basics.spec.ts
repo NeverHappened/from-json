@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import 'mocha';
-import { Property, fromJson, typeInfo } from './public-api';
+import { Property, fromJson, typeInfo } from '../public-api';
 
 class SimpleClass {
 
   @Property()
-  public convertableProperty: number;
+  public convertableProperty: string;
 
   public notConvertableProperty: number = 3;
 }
