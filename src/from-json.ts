@@ -14,8 +14,7 @@ export namespace FromJson {
       let objectPropertyValue;
 
       if (!property) {
-        console.warn(`FromJson: Not parsed incoming key: ${serverPropertyName}`);
-        return;
+        throw new Error(`[FromJson]: Unknown property passed: ${serverPropertyName}`);
       }
 
       const propertyConstructor = type.children ? type.children[property.propertyKey].base : null;
@@ -24,10 +23,7 @@ export namespace FromJson {
         property.arrayType = propertyConstructor;
       }
 
-      if (!raw[serverPropertyName]) {
-        console.warn(`FromJson: Missing property in ${type}: ${serverPropertyName}`);
-        objectPropertyValue = null;
-      } else if (property.arrayType) {
+      if (property.arrayType) {
         objectPropertyValue = innerValue.map((element) => this.convertFromJson(property.arrayType, element));
       } else if (property.nestedClass) {
         objectPropertyValue = this.convertFromJson(property.constructr, innerValue);
