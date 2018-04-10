@@ -1,6 +1,6 @@
 {
   "name": "from-json",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Easily convert from json object to classes with decorators",
   "scripts": {
     "compile": "tsc",
