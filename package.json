@@ -1,5 +1,5 @@
 {
-  "name": "from-json",
+  "name": "@nhpd/from-json",
   "version": "1.0.0",
   "description": "Easily convert from json object to classes with decorators",
   "scripts": {
