@@ -24,6 +24,14 @@ Install dependencies
 yarn
 ```
 
+Run tests
+```
+yarn test
+```
+
+# Release
+Increase version in package.json
+
 Compile typescript
 ```
 yarn run compile
