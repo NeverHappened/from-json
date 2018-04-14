@@ -1,6 +1,6 @@
 {
   "name": "@nhpd/from-json",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Easily convert from json object to classes with decorators",
   "scripts": {
     "compile": "tsc",
