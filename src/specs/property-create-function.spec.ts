@@ -4,11 +4,11 @@ import 'reflect-metadata';
 import { Property, fromJson, typeInfo } from '../public-api';
 
 function convert(isoString): Date {
-  return new Date(isoString);
+  return 
 }
 
 class SimpleClass {
-  @Property({ createFunction: convert })
+  @Property({ createFunction: (isoString) => new Date(isoString) })
   public convertableProperty: Date;
 }
 

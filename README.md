@@ -96,8 +96,13 @@ const converted = fromJson<GenericClass<ConcretePropertyClass>>(raw, info);
 console.log(converted.convertableProperty.prop) === 'Test'; // true
 ````
 
-## TODO:
-## For autoconversion of classes that cannot be annotated with @Property (For example, Date), use !TODO!
+## For autoconversion of classes that cannot be annotated with @Property (For example, Date), use
+````typescript
+class SimpleClass {
+  @Property({ createFunction: (isoString) => new Date(isoString) })
+  public convertableProperty: Date;
+}
+````
 
 # Gotchas
 1. You cannot use autodiscover if you have an array, because we cannot infer the generic constructor from the Array class. Use customClass.
