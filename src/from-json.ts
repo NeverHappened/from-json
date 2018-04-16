@@ -27,7 +27,7 @@ export namespace FromJson {
     children: TypeChildren,
     rawData: any,
   ): UpdateInfo {
-    let { propertyKey, isGeneric, isArray, constructr } = property;
+    let { propertyKey, isGeneric, isArray, constructr, createFunction } = property;
 
     if (isGeneric) {
       if (!children[propertyKey]) {
@@ -43,13 +43,15 @@ export namespace FromJson {
       rawValue,
       needRecursiveConversion,
       constructr,
+      createFunction,
     };
   }
 
   function convertProperty<T>(update: UpdateInfo): any {
-    const { needRecursiveConversion, rawValue, constructr } = update;
+    const { needRecursiveConversion, rawValue, constructr, createFunction } = update;
 
-    if (needRecursiveConversion) { return rawValue.map((element) => fromJson(ty(constructr), element)); }
+    if (createFunction) { return createFunction(rawValue); }
+    else if (needRecursiveConversion) { return rawValue.map((element) => fromJson(ty(constructr), element)); }
     else if (constructr) { return fromJson(ty(constructr), rawValue); }
     else { return rawValue; }
   }
@@ -58,5 +60,6 @@ export namespace FromJson {
     rawValue: any;
     needRecursiveConversion: boolean;
     constructr: TypeBase;
+    createFunction?: Function;
   }
 }

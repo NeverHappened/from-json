@@ -6,7 +6,7 @@ export function fromJson<T>(type: TypeInfo, rawData: any): T {
 }
 
 export function Property(config: PropertyConfig = {}): Function  {
-  const { key, customClass, generic, autodiscovered } = config;
+  const { key, customClass, generic, autodiscovered, createFunction } = config;
 
   return function(target: any, propertyKey: string) {
     const serverPropertyKey = key || propertyKey;
@@ -17,7 +17,7 @@ export function Property(config: PropertyConfig = {}): Function  {
     const isGeneric = generic || false;
     const constructr = autodiscovered ? propertyClass : customClass;
 
-    modifiedProperties[serverPropertyKey] = { propertyKey, constructr, isArray, isGeneric };
+    modifiedProperties[serverPropertyKey] = { propertyKey, constructr, isArray, isGeneric, createFunction };
     target.properties = modifiedProperties;
   };
 }
@@ -38,6 +38,9 @@ export interface PropertyConfig {
   
   // If true, property class will be deduced from the property field
   autodiscovered?: boolean;
+
+  // If set, used instead of the custom class
+  createFunction?: Function;
 }
 
 export interface Properties {
@@ -62,4 +65,5 @@ export interface InnerPropertyConfig {
   isGeneric: boolean;
   isArray: boolean;
   constructr?: TypeBase;
+  createFunction?: Function;
 }
